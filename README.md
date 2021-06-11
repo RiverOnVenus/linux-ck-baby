@@ -1,6 +1,6 @@
 # Linux-ck-uksm-cjktty
 
-![GitHub](https://img.shields.io/github/license/RiverOnVenus/linux-ck-uksm-cjktty)[![PKGBUILD CI](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml/badge.svg)](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml)![GitHub all releases](https://img.shields.io/github/downloads/RiverOnVenus/linux-ck-uksm-cjktty/total)
+![GitHub](https://img.shields.io/github/license/RiverOnVenus/linux-ck-uksm-cjktty) [![PKGBUILD CI](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml/badge.svg)](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml) ![GitHub all releases](https://img.shields.io/github/downloads/RiverOnVenus/linux-ck-uksm-cjktty/total)
 
 The Linux-ck-uksm-cjktty kernel and modules with the ck1 patchset and uksm patch and cjktty patch featuring MuQSS CPU scheduler and default bbr.
 
