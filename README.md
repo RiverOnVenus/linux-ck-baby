@@ -17,9 +17,9 @@ The Linux-ck-uksm-cjktty kernel and modules with the ck1 patchset and uksm patch
 
 ## About UKSM
 
-- [dolohow/uksm](dolohow/uksm)
+- [dolohow/uksm](https://github.com/dolohow/uksm)
 
 ## About CJKTTY
 
-- [zhmars/cjktty-patches](zhmars/cjktty-patches)
+- [zhmars/cjktty-patches](https://github.com/zhmars/cjktty-patches)
 
