@@ -58,6 +58,10 @@ vm.dirty_ratio = 60
 vm.swappiness = 100
 ```
 
+## Special Thanks
+
+[@graysky2](https://github.com/graysky2)
+
 ## About CK
 
 - [Linux-ck](https://wiki.archlinux.org/title/Linux-ck)
