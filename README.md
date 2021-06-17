@@ -2,7 +2,7 @@
 
 ![GitHub](https://img.shields.io/github/license/RiverOnVenus/linux-ck-uksm-cjktty) [![PKGBUILD CI](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml/badge.svg)](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml) ![GitHub all releases](https://img.shields.io/github/downloads/RiverOnVenus/linux-ck-uksm-cjktty/total)
 
-The Linux-ck-uksm-cjktty kernel and modules with the ck1 patchset and uksm patch and cjktty patch featuring MuQSS CPU scheduler and default bbr.
+The Linux-ck-uksm-cjktty kernel and modules with the ck1 patchset and uksm patch and cjktty patch featuring MuQSS CPU scheduler and default bbr. Built on the Linux-ck maintained by [graysky](https://github.com/graysky2).
 
 - Con Kolivas' ck patchset including a CPU scheduler named MuQSS (*Multiple Queue Skiplist Scheduler*, pronounced *mux*) which replaces Brain Fuck Scheduler (BFS), his previous work. Many Arch Linux users choose this kernel for its excellent desktop interactivity and responsiveness under any load situation. It is designed for desktop/laptop use but not for servers. It provides low latency environment and works well for 16 CPUs or fewer.
 - UKSM patch is an improvement upon KSM. Some basic data structures and routines are borrowed from ksm.c .
