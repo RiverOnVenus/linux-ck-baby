@@ -49,7 +49,7 @@ net.core.default_qdisc = cake
 # Virtual memory
 vm.vfs_cache_pressure = 50
 vm.dirty_background_ratio = 5
-vm.dirty_ratio = 60
+vm.dirty_ratio = 10
 
 # For Solid State Drives
 vm.swappiness = 100
