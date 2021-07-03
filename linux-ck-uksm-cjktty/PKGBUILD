@@ -99,7 +99,6 @@ source=(
   "0010-bbr2.patch::${_patchsource}/0010-bbr2-5.12-introduce-BBRv2.patch"
   "0011-bfq.patch::${_patchsource}/0011-bfq-patches.patch"
   "0012-block.patch::${_patchsource}/0012-block-patches.patch"
-  "0014-futex2-resync-from-gitlab.collabora.com.patch::${_patchsource}/0014-futex2-resync-from-gitlab.collabora.com.patch"
   "00015-lru-patches.patch::${_patchsource}/00015-lru-patches.patch"
 )
 validpgpkeys=(
