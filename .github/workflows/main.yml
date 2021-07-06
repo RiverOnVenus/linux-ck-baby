@@ -18,6 +18,6 @@ jobs:
       uses: ncipollo/release-action@v1.8.6
       with:
           allowUpdates: 1
-          tag: "v5.12.14-2"
+          tag: "v5.12.14-3"
           artifacts: "./*/*.zst"
           token: ${{ secrets.GITHUB_TOKEN }}
