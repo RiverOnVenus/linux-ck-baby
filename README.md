@@ -2,12 +2,12 @@
 
 ![GitHub](https://img.shields.io/github/license/RiverOnVenus/linux-ck-uksm-cjktty) [![PKGBUILD CI](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml/badge.svg)](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml) ![GitHub all releases](https://img.shields.io/github/downloads/RiverOnVenus/linux-ck-uksm-cjktty/total)
 
-The Linux-ck-uksm-cjktty kernel and modules with the ck1 patchset and uksm patch and cjktty patch etc.. featuring MuQSS CPU scheduler and default bbr2. Built on the [Linux-ck](https://aur.archlinux.org/packages/linux-ck/) maintained by [graysky](https://github.com/graysky2).
+The Linux-ck-uksm-cjktty kernel and modules with the ck1 patchset and uksm patch and cjktty patch etc.. featuring MuQSS CPU scheduler and default bbr2. Built on the Linux-ck maintained by [graysky](https://github.com/graysky2).
 
-- Con Kolivas' ck patchset including a CPU scheduler named MuQSS (*Multiple Queue Skiplist Scheduler*, pronounced *mux*) which replaces Brain Fuck Scheduler (BFS), his previous work. Many Arch Linux users choose this kernel for its excellent desktop interactivity and responsiveness under any load situation. It is designed for desktop/laptop use but not for servers. It provides low latency environment and works well for 16 CPUs or fewer.
-- UKSM patch is an improvement upon KSM. Some basic data structures and routines are borrowed from ksm.c .
-- CJKTTY patch support in Linux tty display Chinese.
-- BBR is a congestion control algorithm proposed by Google.
+- Con Kolivas' [ck patchset](http://ck.kolivas.org/patches/) including a CPU scheduler named MuQSS (*Multiple Queue Skiplist Scheduler*, pronounced *mux*) which replaces Brain Fuck Scheduler (BFS), his previous work. Many Arch Linux users choose this kernel for its excellent desktop interactivity and responsiveness under any load situation. It is designed for desktop/laptop use but not for servers. It provides low latency environment and works well for 16 CPUs or fewer.
+- [UKSM patch](https://github.com/dolohow/uksm) is an improvement upon KSM. Some basic data structures and routines are borrowed from ksm.c .
+- [CJKTTY patch](https://github.com/zhmars/cjktty-patches) support in Linux tty display Chinese.
+- [BBR](https://github.com/google/bbr) is a congestion control algorithm proposed by Google.
 
 ## Build and install
 
@@ -56,21 +56,13 @@ vm.swappiness = 100
 # See https://chrisdown.name/2018/01/02/in-defence-of-swap.html
 ```
 
-## About CK
+## More about CK and MuQSS
 
 - [Linux-ck](https://wiki.archlinux.org/title/Linux-ck)
 - [LKML announcement](https://lkml.org/lkml/2016/10/29/4)
-- [Kernel patch repository of Con Kolivas](http://ck.kolivas.org/patches/)
 - [Con Kolivas' Blog](https://ck-hack.blogspot.it/)
 
-## About UKSM
+## PATCHES
 
-- [dolohow/uksm](https://github.com/dolohow/uksm)
+SirLucjan (Piotr Gorski) for his patches [sirlucjan/kernel-patches](https://github.com/sirlucjan/kernel-patches)
 
-## About CJKTTY
-
-- [zhmars/cjktty-patches](https://github.com/zhmars/cjktty-patches)
-
-## About BBR
-
-- [google/bbr](https://github.com/google/bbr)
