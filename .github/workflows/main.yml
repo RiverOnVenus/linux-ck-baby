@@ -1,5 +1,6 @@
 name: PKGBUILD CI
-on: push
+on:
+  workflow_dispatch:
 jobs:
   pkgbuild:
     runs-on: ubuntu-latest
