@@ -1,5 +1,5 @@
 name: PKGBUILD CI
-on:
+on: push
   workflow_dispatch:
 jobs:
   pkgbuild:
