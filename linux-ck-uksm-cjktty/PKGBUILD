@@ -66,8 +66,8 @@ _subarch=36
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ck-uksm-cjktty
-pkgver=5.12.15
-pkgrel=2
+pkgver=5.12.16
+pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
 url="https://wiki.archlinux.org/index.php/Linux-ck"
