@@ -77,13 +77,13 @@ ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue
 
 **Reboot or force [udev#Loading new rules](https://wiki.archlinux.org/title/Udev#Loading_new_rules)**:
 
-If rules fail to reload automatically:
+If rules fail to reload automatically, use:
 
 ```
 # udevadm control --reload
 ```
 
-To manually force *udev* to trigger your rules:
+To manually force *udev* to trigger your rules, use:
 
 ```
 # udevadm trigger
