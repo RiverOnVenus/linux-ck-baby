@@ -6,7 +6,7 @@ The Linux-ck-uksm-cjktty kernel and modules with the ck1 patchset and uksm patch
 
 - Con Kolivas' [ck patchset](http://ck.kolivas.org/patches/) including a CPU scheduler named MuQSS (*Multiple Queue Skiplist Scheduler*, pronounced *mux*) which replaces Brain Fuck Scheduler (BFS), his previous work. Many Arch Linux users choose this kernel for its excellent desktop interactivity and responsiveness under any load situation. It is designed for desktop/laptop use but not for servers. It provides low latency environment and works well for 16 CPUs or fewer.
 - [UKSM patch](https://github.com/dolohow/uksm) is an improvement upon KSM. Some basic data structures and routines are borrowed from ksm.c .
-- [CJKTTY patch](https://github.com/zhmars/cjktty-patches) support in Linux tty display Chinese.
+- [CJKTTY patch](https://github.com/zhmars/cjktty-patches) supports displaying CJK characters on Linux tty.
 - [BBR](https://github.com/google/bbr) is a congestion control algorithm proposed by Google.
 
 ## Build and install
