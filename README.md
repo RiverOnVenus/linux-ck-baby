@@ -1,4 +1,4 @@
-# Linux-ck-uksm-cjktty
+# My own kernel. Use at your own risk.
 
 ![GitHub](https://img.shields.io/github/license/RiverOnVenus/linux-ck-uksm-cjktty) [![PKGBUILD CI](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml/badge.svg)](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml) ![GitHub all releases](https://img.shields.io/github/downloads/RiverOnVenus/linux-ck-uksm-cjktty/total)
 
@@ -9,12 +9,12 @@ The Linux-ck-uksm-cjktty kernel and modules with the ck1 patchset and uksm patch
 - [CJKTTY patch](https://github.com/zhmars/cjktty-patches) supports displaying CJK Unified Ideographs on Linux tty.
 - [BBR](https://github.com/google/bbr) is a congestion control algorithm proposed by Google.
 
-## Build and install
+# Build and install
 
 - [AUR](https://aur.archlinux.org/packages/linux-ck-uksm-cjktty/)
 - [Release page](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/releases)
 
-## Sysctl configuration improving performance
+# Sysctl configuration improving performance
 
 ```
 # See https://wiki.archlinux.org/title/Sysctl for more information.
@@ -56,7 +56,7 @@ vm.swappiness = 100
 # See https://chrisdown.name/2018/01/02/in-defence-of-swap.html
 ```
 
-## Changing I/O scheduler
+# Changing I/O scheduler
 
 To change the active I/O scheduler to *bfq* for device *sda*, use:
 
@@ -89,13 +89,14 @@ To manually force *udev* to trigger your rules, use:
 # udevadm trigger
 ```
 
-## More about CK and MuQSS
+# More about CK and MuQSS
 
 - [Linux-ck](https://wiki.archlinux.org/title/Linux-ck)
 - [LKML announcement](https://lkml.org/lkml/2016/10/29/4)
 - [Con Kolivas' Blog](https://ck-hack.blogspot.it/)
 
-## PATCHES
+# PATCHES
 
 SirLucjan (Piotr Gorski) for his patches [sirlucjan/kernel-patches](https://github.com/sirlucjan/kernel-patches)
 
+# You've been warned.
