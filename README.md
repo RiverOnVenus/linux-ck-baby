@@ -1,4 +1,4 @@
-# My own kernel. Use at your own risk.
+# Linux-ck-uksm-cjktty
 
 ![GitHub](https://img.shields.io/github/license/RiverOnVenus/linux-ck-uksm-cjktty) [![PKGBUILD CI](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml/badge.svg)](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml) ![GitHub all releases](https://img.shields.io/github/downloads/RiverOnVenus/linux-ck-uksm-cjktty/total)
 
@@ -94,9 +94,3 @@ To manually force *udev* to trigger your rules, use:
 - [Linux-ck](https://wiki.archlinux.org/title/Linux-ck)
 - [LKML announcement](https://lkml.org/lkml/2016/10/29/4)
 - [Con Kolivas' Blog](https://ck-hack.blogspot.it/)
-
-# PATCHES
-
-SirLucjan (Piotr Gorski) for his patches [sirlucjan/kernel-patches](https://github.com/sirlucjan/kernel-patches)
-
-# You've been warned.
