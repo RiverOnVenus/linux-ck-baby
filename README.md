@@ -1,8 +1,8 @@
 # Linux-ck-baby
 
-The Linux-ck-baby kernel and modules with ck's hrtimer patches and Baby CPU scheduler  by [Hamad Al Marri](https://github.com/hamadmarri) and with some other patches. Built on the [Linux-ck](https://aur.archlinux.org/packages/linux-ck/) maintained by [graysky](https://github.com/graysky2).
+The Linux-ck-baby kernel and modules with [Con Kolivas](https://github.com/ckolivas)' hrtimer patches and Baby CPU scheduler  by [Hamad Al Marri](https://github.com/hamadmarri) and with some other patches. Built on the [Linux-ck](https://aur.archlinux.org/packages/linux-ck/) maintained by [graysky](https://github.com/graysky2).
 
-- [CK's hrtimer patches](https://github.com/xanmod/linux-patches/tree/master/linux-5.14.y-xanmod/ck-hrtimer) and the recommended 1000 Hz tick rate.
+- [Con Kolivas' hrtimer patches](https://github.com/xanmod/linux-patches/tree/master/linux-5.14.y-xanmod/ck-hrtimer) and the recommended 1000 Hz tick rate.
 - [Baby-CPU-Scheduler](https://github.com/hamadmarri/Baby-CPU-Scheduler) is a very basic and lightweight yet very performant CPU scheduler.
 - [UKSM patch](https://github.com/dolohow/uksm) is an improvement upon KSM. Some basic data structures and routines are borrowed from ksm.c .
 - [CJKTTY patch](https://github.com/zhmars/cjktty-patches) supports displaying CJK Unified Ideographs on Linux tty.
