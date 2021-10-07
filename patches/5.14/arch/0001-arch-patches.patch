@@ -1,4 +1,4 @@
-From 8360531448b1fd7b120ba6f6b50b652187ede5fc Mon Sep 17 00:00:00 2001
+From c471b33656fcf36a9b04c9d4efe8c8e534f5cf3d Mon Sep 17 00:00:00 2001
 From: "Jan Alexander Steffens (heftig)" <jan.steffens@gmail.com>
 Date: Mon, 16 Sep 2019 04:53:20 +0200
 Subject: [PATCH 1/6] ZEN: Add sysctl and CONFIG to disallow unprivileged
@@ -150,10 +150,10 @@ index ef82d401d..5a6c2e071 100644
  static DEFINE_MUTEX(userns_state_mutex);
  
 -- 
-2.33.0.328.g8b7c11b866
+2.33.0.610.gcefe983a32
 
 
-From 230e23167b8827b8cd2f972f1333ba9f313db7ec Mon Sep 17 00:00:00 2001
+From a35416843425c58b27cfc74cdf6690cf38bd1132 Mon Sep 17 00:00:00 2001
 From: Wai Paulo Valerio Wang <waicool20@gmail.com>
 Date: Thu, 8 Jul 2021 04:00:59 +0800
 Subject: [PATCH 2/6] Bluetooth: btusb: Add support for IMC Networks Mediatek
@@ -230,10 +230,10 @@ index bd37d6fb8..e13a510e1 100644
  	/* Additional Realtek 8723AE Bluetooth devices */
  	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
 -- 
-2.33.0.328.g8b7c11b866
+2.33.0.610.gcefe983a32
 
 
-From 0dfc4fa00c42e32e2df3100b062e83fe3b39a0ef Mon Sep 17 00:00:00 2001
+From f5f857a8e729566e9bd5cc2323e8e3d60aa42736 Mon Sep 17 00:00:00 2001
 From: Aaron Ma <aaron.ma@canonical.com>
 Date: Fri, 23 Jul 2021 01:17:18 +0800
 Subject: [PATCH 3/6] Bluetooth: btusb: Add support for Foxconn Mediatek Chip
@@ -302,10 +302,10 @@ index e13a510e1..aac732cc9 100644
  	/* Additional Realtek 8723AE Bluetooth devices */
  	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
 -- 
-2.33.0.328.g8b7c11b866
+2.33.0.610.gcefe983a32
 
 
-From c572ab6b9a689cc7ce3aebafe3a55ce7133db57e Mon Sep 17 00:00:00 2001
+From d18d916893112fdfc2c5d979d5f8c8d8b786aa66 Mon Sep 17 00:00:00 2001
 From: Takashi Iwai <tiwai@suse.de>
 Date: Mon, 9 Aug 2021 09:18:27 +0200
 Subject: [PATCH 4/6] ALSA: pcm: Check mmap capability of runtime dma buffer at
@@ -367,10 +367,10 @@ index 71323d807..dc9fa312f 100644
  }
  
 -- 
-2.33.0.328.g8b7c11b866
+2.33.0.610.gcefe983a32
 
 
-From 512f1320b7bf7524ecb0abba9fcfb166b69e07c2 Mon Sep 17 00:00:00 2001
+From 9cbcebf8f7a026c7e8ff8e60a6584ccc3872386a Mon Sep 17 00:00:00 2001
 From: Takashi Iwai <tiwai@suse.de>
 Date: Mon, 9 Aug 2021 09:18:28 +0200
 Subject: [PATCH 5/6] ALSA: pci: rme: Set up buffer type properly
@@ -443,10 +443,10 @@ index f1aad3876..9ad253392 100644
  	if (rme9652->playback_substream == NULL) {
  		rme9652_stop(rme9652);
 -- 
-2.33.0.328.g8b7c11b866
+2.33.0.610.gcefe983a32
 
 
-From d36226e3a5bcf40551724425446b0a5589e07f5a Mon Sep 17 00:00:00 2001
+From 8e1b2c7ad5795e342cbaebb47536c400b47c9c4f Mon Sep 17 00:00:00 2001
 From: Takashi Iwai <tiwai@suse.de>
 Date: Mon, 9 Aug 2021 09:18:29 +0200
 Subject: [PATCH 6/6] ALSA: pci: cs46xx: Fix set up buffer type properly
@@ -539,5 +539,5 @@ index 1e1eb17f8..d43927dcd 100644
  	return 0;
  }
 -- 
-2.33.0.328.g8b7c11b866
+2.33.0.610.gcefe983a32
 
