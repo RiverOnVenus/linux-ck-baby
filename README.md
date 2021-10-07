@@ -1,20 +1,22 @@
-# Linux-ck-uksm-cjktty
+# Linux-ck-baby
 
-![GitHub](https://img.shields.io/github/license/RiverOnVenus/linux-ck-uksm-cjktty) [![PKGBUILD CI](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml/badge.svg)](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml) ![GitHub all releases](https://img.shields.io/github/downloads/RiverOnVenus/linux-ck-uksm-cjktty/total)
+![GitHub](https://img.shields.io/github/license/RiverOnVenus/linux-ck-uksm-cjktty) [![PKGBUILD CI](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml/badge.svg)](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/actions/workflows/main.yml) 
 
-The Linux-ck-uksm-cjktty kernel and modules with ck's hrtimer patches and uksm patch and cjktty patch ~~featuring MuQSS CPU scheduler~~ and default bbr2. Built on the [Linux-ck](https://aur.archlinux.org/packages/linux-ck/) maintained by [graysky](https://github.com/graysky2).
+The Linux-ck-baby kernel and modules with ck's hrtimer patches and Baby CPU scheduler  by [Hamad Al Marri](https://github.com/hamadmarri) and with some other patches. Built on the [Linux-ck](https://aur.archlinux.org/packages/linux-ck/) maintained by [graysky](https://github.com/graysky2).
 
-> **[5.14 and the future of MuQSS and -ck once again](https://ck-hack.blogspot.com/2021/08/514-and-future-of-muqss-and-ck-once.html)  -ck hacking**
-
-- Con Kolivas' [ck patchset](http://ck.kolivas.org/patches/) including a CPU scheduler named MuQSS (*Multiple Queue Skiplist Scheduler*, pronounced *mux*) which replaces Brain Fuck Scheduler (BFS), his previous work. Many Arch Linux users choose this kernel for its excellent desktop interactivity and responsiveness under any load situation. It is designed for desktop/laptop use but not for servers. It provides low latency environment and works well for 16 CPUs or fewer.
+- [CK's hrtimer patches](https://github.com/xanmod/linux-patches/tree/master/linux-5.14.y-xanmod/ck-hrtimer) and the recommended 1000 Hz tick rate.
+- [Baby-CPU-Scheduler](https://github.com/hamadmarri/Baby-CPU-Scheduler) is a very basic and lightweight yet very performant CPU scheduler.
 - [UKSM patch](https://github.com/dolohow/uksm) is an improvement upon KSM. Some basic data structures and routines are borrowed from ksm.c .
 - [CJKTTY patch](https://github.com/zhmars/cjktty-patches) supports displaying CJK Unified Ideographs on Linux tty.
 - [BBR](https://github.com/google/bbr) is a congestion control algorithm proposed by Google.
 
 # Build and install
 
-- [AUR](https://aur.archlinux.org/packages/linux-ck-uksm-cjktty/)
-- [Release page](https://github.com/RiverOnVenus/linux-ck-uksm-cjktty/releases)
+```
+git clone https://github.com/RiverOnVenus/linux-ck-baby.git
+cd linux-ck-baby
+makepkg -srci
+```
 
 # Sysctl configuration improving performance
 
@@ -91,8 +93,3 @@ To manually force *udev* to trigger your rules, use:
 # udevadm trigger
 ```
 
-# More about CK and MuQSS
-
-- [Linux-ck](https://wiki.archlinux.org/title/Linux-ck)
-- [LKML announcement](https://lkml.org/lkml/2016/10/29/4)
-- [Con Kolivas' Blog](https://ck-hack.blogspot.it/)
