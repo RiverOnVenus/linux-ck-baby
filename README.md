@@ -14,9 +14,21 @@ The Linux-ck-baby kernel and modules with ck's hrtimer patches and Baby CPU sche
 
 ```
 git clone https://github.com/RiverOnVenus/linux-ck-baby.git
-cd linux-ck-baby
+
+cd linux-ck-baby/linux-ck-baby
+
 makepkg -srci
 ```
+
+# Check if Baby CPU Scheduler is enabled
+
+This start-up message should appear in the kernel ring buffer when Baby in enabled, use:
+
+```
+# dmesg | grep -i 'Baby CPU'
+```
+
+You can see: `Baby CPU scheduler (dl) v5.14 by Hamad Al Marri.`
 
 # Sysctl configuration improving performance
 
@@ -92,4 +104,3 @@ To manually force *udev* to trigger your rules, use:
 ```
 # udevadm trigger
 ```
-
