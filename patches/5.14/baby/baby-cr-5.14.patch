@@ -1,8 +1,8 @@
 diff --git a/include/linux/sched.h b/include/linux/sched.h
-index f6935787e7e8..15f9aec26938 100644
+index f6935787e7e8..0659f27c13fc 100644
 --- a/include/linux/sched.h
 +++ b/include/linux/sched.h
-@@ -462,6 +462,14 @@ struct sched_statistics {
+@@ -462,6 +462,15 @@ struct sched_statistics {
  #endif
  };
  
@@ -10,14 +10,15 @@ index f6935787e7e8..15f9aec26938 100644
 +struct bs_node {
 +	struct bs_node*                 next;
 +	struct bs_node*                 prev;
-+	u64				deadline;
++	s64				credit;
++	unsigned int			bid;
 +};
 +#endif
 +
  struct sched_entity {
  	/* For load-balancing: */
  	struct load_weight		load;
-@@ -469,6 +477,10 @@ struct sched_entity {
+@@ -469,6 +478,10 @@ struct sched_entity {
  	struct list_head		group_node;
  	unsigned int			on_rq;
  
@@ -150,10 +151,10 @@ index 978fcfca5871..464b134de739 100644
  obj-$(CONFIG_SMP) += cpupri.o cpudeadline.o topology.o stop_task.o pelt.o
 diff --git a/kernel/sched/bs.c b/kernel/sched/bs.c
 new file mode 100644
-index 000000000000..754038b35f38
+index 000000000000..175d23e80128
 --- /dev/null
 +++ b/kernel/sched/bs.c
-@@ -0,0 +1,909 @@
+@@ -0,0 +1,892 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Baby Scheduler (BS) Class (SCHED_NORMAL/SCHED_BATCH)
@@ -165,10 +166,17 @@ index 000000000000..754038b35f38
 +#include "fair_numa.h"
 +#include "bs.h"
 +
-+#define MIN_DEADLINE_NS	 590000ULL
++#define SLICE_NS	 1000000ULL // 1ms
++#define CREDIT_MAX	100000000ULL
 +
-+/* MIN_DEADLINE_NS * 2 */
-+#define DEADLINE_NS	1180000ULL
++#define RAISE_STEP 10
++
++#define RAISE_BID(bsn) if ((bsn)->bid < 100) (bsn)->bid += (RAISE_STEP)
++#define RESET_BID(bsn) ((bsn)->bid = RAISE_STEP)
++
++#define DELTA_EXEC(se) ((s64)(se->sum_exec_runtime - se->prev_sum_exec_runtime))
++#define EXCEEDED_SLICE(se) ( ((DELTA_EXEC((se))) >= SLICE_NS) )
++
 +
 +const s64 prio_factor[40] = {
 + /* -20 */  -666666L, -633333L, -600000L, -566666L, -533333L,
@@ -181,32 +189,82 @@ index 000000000000..754038b35f38
 + /*  15 */   500000L,  533333L,  566666L,  600000L,  633333L
 +};
 +
-+#define YIELD_MARK(bsn)		((bsn)->deadline |= 0x8000000000000000ULL)
-+#define YIELD_UNMARK(bsn)	((bsn)->deadline &= 0x7FFFFFFFFFFFFFFFULL)
++//#define YIELD_MARK(bsn)		((bsn)->credit |= 0x8000000000000000ULL)
++//#define YIELD_UNMARK(bsn)	((bsn)->credit &= 0x7FFFFFFFFFFFFFFFULL)
 +
 +static inline u64
-+calc_deadline(struct cfs_rq *cfs_rq, struct sched_entity *se)
++calc_credit(struct cfs_rq *cfs_rq, struct sched_entity *se)
 +{
-+	struct task_struct *p = task_of(se);
-+	s64 prio_diff;
-+	u64 now = rq_clock(rq_of(cfs_rq));
-+	u64 deadline = now + DEADLINE_NS;
++	//struct task_struct *p = task_of(se);
++	//s64 prio_diff;
++	//u64 now = rq_clock(rq_of(cfs_rq));
++	u64 credit = cfs_rq->cash;
 +
-+	if (PRIO_TO_NICE(p->prio) == 0)
-+		return deadline;
++	if (cfs_rq->nr_running > 1)
++		credit /= (u64)(cfs_rq->nr_running);
++	else
++		credit = CREDIT_MAX;
 +
-+	prio_diff = prio_factor[PRIO_TO_NICE(p->prio) + 20];
++	//if (PRIO_TO_NICE(p->prio) == 0)
++		//return credit;
 +
-+	return deadline + prio_diff;
++	//prio_diff = prio_factor[PRIO_TO_NICE(p->prio) + 20];
++
++
++	credit = min_t(u64, credit, CREDIT_MAX);
++
++	//return credit + prio_diff;
++	return credit;
 +}
 +
-+static inline bool
-+reached_deadline(struct cfs_rq *cfs_rq, struct sched_entity *se)
++static inline void
++get_payment(struct cfs_rq *cfs_rq, struct bs_node *bsn)
 +{
-+	u64 now = rq_clock(rq_of(cfs_rq));
-+	s64 delta = se->bs_node.deadline - now;
++	u64 payment = calc_credit(cfs_rq, se_of(bsn));
 +
-+	return (delta <= 0);
++	payment = min_t(u64, payment, cfs_rq->cash);
++	bsn->credit  += payment;
++	cfs_rq->cash -= payment;
++
++	//printk("*************** PAYMENT %llu -> %llu -> %lld (%s)",
++		//cfs_rq->cash, payment, bsn->credit, task_of(se_of(bsn))->comm);
++}
++
++static inline void redistribute_cash(struct cfs_rq *cfs_rq)
++{
++	struct bs_node *bsn = cfs_rq->head;
++
++	//printk("*************** REDISTRIBUTE");
++
++	// don't forget curr
++	get_payment(cfs_rq, &cfs_rq->curr->bs_node);
++
++	while (bsn) {
++		get_payment(cfs_rq, bsn);
++		bsn = bsn->next;
++	}
++}
++
++static inline void
++charge(struct cfs_rq *cfs_rq, struct bs_node *bsn)
++{
++	u64 charge;
++
++	if (!cfs_rq->slices) {
++		cfs_rq->cash = REFILL_CASH;
++		redistribute_cash(cfs_rq);
++		cfs_rq->slices = SLICES_NUM;
++	}
++
++	cfs_rq->slices--;
++
++	charge = bsn->credit * bsn->bid / 100ULL;
++
++	bsn->credit  -= charge;
++	cfs_rq->cash += charge;
++
++	//printk("*************** CHARGE %llu <- %llu <- %lld (%s)",
++		//cfs_rq->cash, charge, bsn->credit, task_of(se_of(bsn))->comm);
 +}
 +
 +static void update_curr(struct cfs_rq *cfs_rq)
@@ -224,9 +282,6 @@ index 000000000000..754038b35f38
 +
 +	curr->exec_start = now;
 +	curr->sum_exec_runtime += delta_exec;
-+
-+	if (reached_deadline(cfs_rq, curr))
-+		curr->bs_node.deadline = calc_deadline(cfs_rq, curr);
 +}
 +
 +static void update_curr_fair(struct rq *rq)
@@ -235,91 +290,29 @@ index 000000000000..754038b35f38
 +}
 +
 +/**
-+ * Does a have earlier deadline than b?
++ * Does a bid more than b?
 + */
 +static inline bool
 +entity_before(struct bs_node *a, struct bs_node *b)
 +{
-+	return (s64)(a->deadline - b->deadline) < 0;
++	u64 bid_a, bid_b;
++
++	bid_a = a->credit * a->bid / 100ULL;
++	bid_b = b->credit * b->bid / 100ULL;
++
++	return (s64)(bid_a - bid_b) > 0;
 +}
 +
 +#ifdef CONFIG_SCHED_HRTICK
-+
-+#define DIFF_DL(a, b) ( (s64)((a)->bs_node.deadline - (b)->bs_node.deadline) )
-+#define DIFF_DL_NOW(a, now) ( (s64)((a)->bs_node.deadline - (now)) )
-+
-+static struct sched_entity *
-+pick_next_entity(struct cfs_rq *cfs_rq, struct sched_entity *curr);
-+
-+/*
-+ *     cs         cm         cd
-+ *     |  min dl  |          |
-+ *     |<-------->|          |
-+ *  n1 |    n1    |    n2    | n3
-+ *  @@@|@@@@@@@@@@|##########|****
-+ *     | c1       |          |
-+ *     | ^        |    c2    |
-+ *     |now       |    ^     |
-+ *     |          |   now    |
-+ *
-+ * n1 & c1: hr(cm - c1)
-+ * n2 & c1: hr(cd - c1)
-+ * n3 & c1: hr(n3 - c1)
-+ *
-+ * n1 & c2: resched_curr
-+ * n2 & c2: hr(cd - c2)
-+ * n3 & c2: hr(n3 - c2)
-+ */
 +static void hrtick_start_fair(struct rq *rq, struct task_struct *pcurr)
 +{
 +	struct sched_entity *curr = &pcurr->se;
-+	struct bs_node *c_bsn = &curr->bs_node;
-+	struct sched_entity *next;
-+	u64 now = rq_clock(rq);
-+	s64 cm, cd, c_ran;
++	s64 delta = DELTA_EXEC(curr);
 +
-+	if (rq->cfs.h_nr_running < 2)
-+		return;
-+
-+	next = pick_next_entity(&rq->cfs, NULL);
-+
-+	if (!next)
-+		return;
-+
-+	c_ran	= curr->sum_exec_runtime - curr->prev_sum_exec_runtime;
-+	cm	= MIN_DEADLINE_NS - c_ran;
-+	cd	= DIFF_DL_NOW(curr, now);
-+
-+	// if c1 (if 590us >= current ran)
-+	if (cm >= 0) {
-+		if (entity_before(&next->bs_node, c_bsn)) {
-+			// if n1
-+			if (DIFF_DL(curr, next) - MIN_DEADLINE_NS > 0)
-+				hrtick_start(rq, cm);
-+			// if n2
-+			else
-+				hrtick_start(rq, cd);
-+		}
-+		// if n3
-+		else {
-+			hrtick_start(rq, DIFF_DL_NOW(next, now));
-+		}
-+	}
-+	// if c2
-+	else {
-+		if (entity_before(&next->bs_node, c_bsn)) {
-+			// if n1
-+			if (DIFF_DL(curr, next) - MIN_DEADLINE_NS > 0)
-+				resched_curr(rq);
-+			// if n2
-+			else
-+				hrtick_start(rq, cd);
-+		}
-+		// if n3
-+		else {
-+			hrtick_start(rq, DIFF_DL_NOW(next, now));
-+		}
-+	}
++	if (EXCEEDED_SLICE(curr))
++		resched_curr(rq);
++	else
++		hrtick_start(rq, delta);
 +}
 +
 +/*
@@ -392,18 +385,10 @@ index 000000000000..754038b35f38
 +enqueue_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
 +{
 +	bool curr = cfs_rq->curr == se;
-+	bool renorm = !(flags & ENQUEUE_WAKEUP) || (flags & ENQUEUE_MIGRATED);
 +
 +	update_curr(cfs_rq);
 +
-+	/*
-+	 * Renormalise, such that we're placed at the current
-+	 * moment in time, instead of some random moment in the past. Being
-+	 * placed in the past could significantly boost this task to the
-+	 * fairness detriment of existing tasks.
-+	 */
-+	if (renorm && !curr)
-+		se->bs_node.deadline = calc_deadline(cfs_rq, se);
++	get_payment(cfs_rq, &se->bs_node);
 +
 +	account_entity_enqueue(cfs_rq, se);
 +
@@ -416,20 +401,10 @@ index 000000000000..754038b35f38
 +static void
 +dequeue_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
 +{
-+	int task_sleep = flags & DEQUEUE_SLEEP;
-+	struct task_struct *p = task_of(se);
-+
-+	/*
-+	 * Check if didn't reach its deadline, then
-+	 * rise its priority
-+	 */
-+	if (task_sleep && !reached_deadline(cfs_rq, se) &&
-+	    PRIO_TO_NICE(p->prio) > -20)
-+	{
-+		p->prio--;
-+	}
-+
 +	update_curr(cfs_rq);
++
++	//if (cfs_rq->cash - CASH_MAX < 0)
++		//cfs_rq->cash += se->bs_node.credit;
 +
 +	if (se != cfs_rq->curr)
 +		__dequeue_entity(cfs_rq, se);
@@ -475,7 +450,7 @@ index 000000000000..754038b35f38
 +	struct task_struct *curr = rq->curr;
 +	struct cfs_rq *cfs_rq = task_cfs_rq(curr);
 +
-+	YIELD_MARK(&curr->se.bs_node);
++	//YIELD_MARK(&curr->se.bs_node);
 +
 +	/*
 +	 * Are we the only task in the tree?
@@ -514,8 +489,8 @@ index 000000000000..754038b35f38
 +	cfs_rq->curr = se;
 +	se->prev_sum_exec_runtime = se->sum_exec_runtime;
 +
-+	if (reached_deadline(cfs_rq, se))
-+		se->bs_node.deadline = calc_deadline(cfs_rq, se);
++	charge(cfs_rq, &se->bs_node);
++	RESET_BID(&se->bs_node);
 +}
 +
 +static struct sched_entity *
@@ -529,8 +504,12 @@ index 000000000000..754038b35f38
 +
 +	next = bsn->next;
 +	while (next) {
-+		if (entity_before(next, bsn))
++		if (entity_before(next, bsn)) {
++			RAISE_BID(bsn);
 +			bsn = next;
++		} else {
++			RAISE_BID(next);
++		}
 +
 +		next = next->next;
 +	}
@@ -561,8 +540,8 @@ index 000000000000..754038b35f38
 +
 +	p = task_of(se);
 +
-+	if (prev)
-+		YIELD_UNMARK(&prev->se.bs_node);
++	//if (prev)
++		//YIELD_UNMARK(&prev->se.bs_node);
 +
 +done: __maybe_unused;
 +#ifdef CONFIG_SMP
@@ -677,7 +656,7 @@ index 000000000000..754038b35f38
 +static void
 +check_preempt_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr)
 +{
-+	if (pick_next_entity(cfs_rq, curr) != curr)
++	if (EXCEEDED_SLICE(curr))
 +		resched_curr(rq_of(cfs_rq));
 +}
 +
@@ -706,6 +685,8 @@ index 000000000000..754038b35f38
 +
 +	if (cfs_rq->nr_running > 1)
 +		check_preempt_tick(cfs_rq, curr);
++	else if (EXCEEDED_SLICE(curr))
++		charge(cfs_rq, &curr->bs_node);
 +}
 +
 +static void check_preempt_wakeup(struct rq *rq, struct task_struct *p, int wake_flags)
@@ -1006,15 +987,18 @@ index 000000000000..754038b35f38
 +{
 +	struct cfs_rq *cfs_rq;
 +	struct sched_entity *curr, *se = &p->se;
++	struct bs_node *bsn = &se->bs_node;
 +	struct rq *rq = this_rq();
 +	struct rq_flags rf;
++	bsn->credit = 0;
 +
 +	rq_lock(rq, &rf);
 +	update_rq_clock(rq);
 +
 +	cfs_rq = task_cfs_rq(current);
 +
-+	se->bs_node.deadline = calc_deadline(cfs_rq, se);
++	get_payment(cfs_rq, bsn);
++	bsn->bid = 10;
 +
 +	curr = cfs_rq->curr;
 +	if (curr)
@@ -1065,10 +1049,13 @@ index 000000000000..754038b35f38
 +};
 diff --git a/kernel/sched/bs.h b/kernel/sched/bs.h
 new file mode 100644
-index 000000000000..e0466c0e6ec3
+index 000000000000..f79fd0d12436
 --- /dev/null
 +++ b/kernel/sched/bs.h
-@@ -0,0 +1,149 @@
+@@ -0,0 +1,155 @@
++
++#define REFILL_CASH 1000000000ULL
++#define SLICES_NUM 12
 +
 +/*
 + * After fork, child runs first. If set to 0 (default) then
@@ -1112,6 +1099,9 @@ index 000000000000..e0466c0e6ec3
 +#ifdef CONFIG_SMP
 +	raw_spin_lock_init(&cfs_rq->removed.lock);
 +#endif
++
++	cfs_rq->cash	= REFILL_CASH;
++	cfs_rq->slices	= SLICES_NUM;
 +}
 +
 +__init void init_sched_fair_class(void) {}
@@ -1219,7 +1209,7 @@ index 000000000000..e0466c0e6ec3
 +	return 0;
 +}
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 399c37c95392..dd16a350551d 100644
+index 399c37c95392..8c781aae9a56 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
 @@ -8995,6 +8995,10 @@ void __init sched_init(void)
@@ -1227,7 +1217,7 @@ index 399c37c95392..dd16a350551d 100644
  	wait_bit_init();
  
 +#ifdef CONFIG_BS_SCHED
-+	printk(KERN_INFO "Baby CPU scheduler (dl) v5.14 by Hamad Al Marri.");
++	printk(KERN_INFO "Baby CPU scheduler (cr) v5.14 by Hamad Al Marri.");
 +#endif
 +
  #ifdef CONFIG_FAIR_GROUP_SCHED
@@ -3208,15 +3198,17 @@ index 000000000000..a564478ec3f7
 +#endif /** CONFIG_NUMA_BALANCING */
 +
 diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
-index d53d19770866..9ac800e858fc 100644
+index d53d19770866..073ec2588b56 100644
 --- a/kernel/sched/sched.h
 +++ b/kernel/sched/sched.h
-@@ -545,9 +545,13 @@ struct cfs_rq {
+@@ -545,9 +545,15 @@ struct cfs_rq {
  	 * It is set to NULL otherwise (i.e when none are currently running).
  	 */
  	struct sched_entity	*curr;
 +#ifdef CONFIG_BS_SCHED
 +	struct bs_node		*head;
++	u64			cash;
++	unsigned int		slices;
 +#else
  	struct sched_entity	*next;
  	struct sched_entity	*last;
