@@ -66,7 +66,7 @@ _subarch=36
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 pkgbase=linux-ck-baby
 pkgver=5.14.11
-pkgrel=1
+pkgrel=2
 arch=(x86_64)
 url="https://github.com/RiverOnVenus/linux-ck-baby"
 license=(GPL2)
@@ -81,17 +81,18 @@ _commit=e2d48df5def86f498766b22e836a9c2f1bcb3809
 _xan=linux-5.14.y-xanmod
 
 _gcc_more_v=20210914
-_patchsource="https://raw.githubusercontent.com/RiverOnVenus/linux-ck-baby/master/patches/5.14"
+_patchsource="https://raw.githubusercontent.com/RiverOnVenus/kernel-patches/master"
 source=(
   "https://www.kernel.org/pub/linux/kernel/v5.x/linux-$pkgver.tar".{xz,sign}
   config         # the main kernel config file
   "more-uarches-$_gcc_more_v.tar.gz::https://github.com/graysky2/kernel_compiler_patch/archive/$_gcc_more_v.tar.gz"
   "xanmod-patches-from-ck-$_commit.tar.gz::https://github.com/xanmod/linux-patches/archive/$_commit.tar.gz"
-  "${_patchsource}/arch/0001-arch-patches.patch"
-  "${_patchsource}/baby/baby-dl-5.14.patch"
-  "${_patchsource}/uksm/0001-UKSM-for-5.14.patch"
-  "${_patchsource}/cjktty/0001-cjktty-5.14.patch"
-  "${_patchsource}/bbr/0001-bbr2-5.14-introduce-BBRv2.patch"
+  "${_patchsource}/v5.14/arch/0001-arch-patches-v10.patch"
+  "${_patchsource}/cpu-scheduler/v5.14/baby/baby-dl-5.14.patch"
+  "${_patchsource}/v5.14/uksm/0001-UKSM-for-5.14-v2.patch"
+  "${_patchsource}/v5.14/cjktty/0001-cjktty-5.14.patch"
+  "${_patchsource}/v5.14/bbr/0001-bbr2-5.14-introduce-BBRv2.patch"
+  "${_patchsource}/v5.14/bfq-lucjan/5.14-bfq-lucjan-r2K211006v1.patch"
 )
 validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
@@ -99,14 +100,15 @@ validpgpkeys=(
 )
 b2sums=('b84afc268eaace7029d13b0e37b5366d042e96f1437b95b08a995d7717d6b6ed118e929c2d0e0929ddcc4dba772768d686d1c3a29a7c9ed60b9534797b006efa'
         'SKIP'
-        '1c45fa4c2e6864702efa759e7e2071294c7d0b39449a885c72c876033d1420d34d565d159b034a347c0d67fd2d13426878f049099dddae5881d17fb47a55bea2'
+        'e549ff2253b3819d38df7e71d0ff377dc6faf332745295c8a2cf40d45a57128e3a707c8f715b6c1c11531575e37c08eb8bd1eba092b39acc432ab94c973fea67'
         'd1c083f96f645679c5214e05f906b47f17ac6a8b3dd2faeb219e3ceda3a008e3fe47c4a79b0345978cec5c5e28da9b20727970cf5c788d52c3782dc5b36aa211'
         'bd20774ee2c9856601af2c89a3af95c6abc812b71253368090e9c252edcce452f416bfeed54ced0886d401b5a9e1cb72c16ea5f04a72d8ded596c0d083f80e42'
         'eeb23a97714d5cd1570403e7dc1d236859b972809b9faf689f0c1029d8367b6bcd6346ed9f01de5e3e93bfcadad5d35ee12dec2f6992250bd8459ed85befd5a8'
         '498e15328353e35834567052725caf41dc1beaf06028e4c3fd126afc2413d1bedb240c2d052d5a77435f91bef04549ac0f42defcfeb81e7fdba57085fc1e4548'
         '8f6d6263f0e517b6e7a1809fc57e01cc4b13dd261f778041026ec510f48257d4f525c3cb0b0935e291293960c9191282f5765ca0af3d948838e8f865c7deafcc'
         '21d13b890e7b80c924e18ae11f675d69a80adffbe75e37bebd003024e7299c582346b0df60b67c709eba9678bcf6dda7da852c9cf18d43804ddd8ee9388b9ea5'
-        'e263f1cf228d5a2c26340f37fa1b4a6d6c643b1a22378f37c96b68f5ec10372d65e2bf96716aec0722b18d76ca752b9debf82f621896e03917c977d8db2a4b21')
+        'e263f1cf228d5a2c26340f37fa1b4a6d6c643b1a22378f37c96b68f5ec10372d65e2bf96716aec0722b18d76ca752b9debf82f621896e03917c977d8db2a4b21'
+        'de184a6a500906e86f8b4b8b524ea70b32f9a7ed6522606530caeae17410c6c9a5bbe58914a3c2520cc319d764bd4ff09a291cee986cabfe77a575979ea7a4ff')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
@@ -155,10 +157,15 @@ prepare() {
   scripts/config --disable CONFIG_KVM_WERROR
   
   # ck recommends 1000 Hz tick and the hrtimer patches in lieu of ck1
-  scripts/config --disable CONFIG_HZ_300
-  scripts/config --enable CONFIG_HZ_1000
-  scripts/config --set-val CONFIG_HZ 1000
-  
+#   scripts/config --disable CONFIG_HZ_300
+#   scripts/config --enable CONFIG_HZ_1000
+#   scripts/config --set-val CONFIG_HZ 1000
+
+    # 803 Hz is the default for Baby (dl)
+    scripts/config --disable CONFIG_HZ_300
+    scripts/config --enable CONFIG_HZ_803
+    scripts/config --set-val CONFIG_HZ 803
+
 # BBR2
   scripts/config --module CONFIG_TCP_CONG_CUBIC
   scripts/config --disable CONFIG_DEFAULT_CUBIC
@@ -192,6 +199,7 @@ prepare() {
   # non-interactively apply ck1 default options
   # this isn't redundant if we want a clean selection of subarch below
   make -j$(nproc) olddefconfig
+  diff -u ../config .config || :
 
   # https://github.com/graysky2/kernel_gcc_patch
   # make sure to apply after olddefconfig to allow the next section
