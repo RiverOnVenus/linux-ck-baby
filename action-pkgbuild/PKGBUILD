@@ -65,8 +65,8 @@ _subarch=36
 
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 pkgbase=linux-ck-baby
-pkgver=5.14.11
-pkgrel=2
+pkgver=5.14.12
+pkgrel=1
 arch=(x86_64)
 url="https://github.com/RiverOnVenus/linux-ck-baby"
 license=(GPL2)
@@ -98,7 +98,7 @@ validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
   '647F28654894E3BD457199BE38DBBDC86092693E'  # Greg Kroah-Hartman
 )
-b2sums=('b84afc268eaace7029d13b0e37b5366d042e96f1437b95b08a995d7717d6b6ed118e929c2d0e0929ddcc4dba772768d686d1c3a29a7c9ed60b9534797b006efa'
+b2sums=('854c3160a327a38ba0e8e35a2952029670429d829e903ba4fda659aa7cc7b88014b5dbdeefd2e0cc95e0311875fc7dae4c5fad825bff72102a894624845acbb8'
         'SKIP'
         'e549ff2253b3819d38df7e71d0ff377dc6faf332745295c8a2cf40d45a57128e3a707c8f715b6c1c11531575e37c08eb8bd1eba092b39acc432ab94c973fea67'
         'd1c083f96f645679c5214e05f906b47f17ac6a8b3dd2faeb219e3ceda3a008e3fe47c4a79b0345978cec5c5e28da9b20727970cf5c788d52c3782dc5b36aa211'
