@@ -20,6 +20,16 @@ cd linux-ck-baby/linux-ck-baby
 updpkgsums && makepkg -srci
 ```
 
+# Clang and DKMS
+
+When you use a kernel compiled by CLANG/LLVM/LTO, some modules that use DKMS need to be recompiled with CLANG/LLVM. Otherwise DKMS will fail.
+
+You need to modify the `/etc/dkms/framework.conf` file, add two lines to the end of the file: `export LLVM=1`, `export CC=clang`.
+
+![framework.conf](./framework.conf.png)
+
+If you have done that, just reinstall or install the kernel compiled with CLANG/LLVM/LTO and DKMS will not fail again.
+
 # Check if Baby CPU Scheduler is enabled
 
 This start-up message should appear in the kernel ring buffer when Baby in enabled, use:
