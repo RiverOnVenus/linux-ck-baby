@@ -71,7 +71,7 @@ _subarch=36
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 pkgbase=linux-ck-baby
 pkgver=5.14.13
-pkgrel=1
+pkgrel=2
 arch=(x86_64)
 url="https://github.com/RiverOnVenus/linux-ck-baby"
 license=(GPL2)
@@ -100,7 +100,8 @@ source=(
   "${_patchsource}/v5.14/uksm/0001-UKSM-for-5.14-v2.patch"
   "${_patchsource}/v5.14/cjktty/0001-cjktty-5.14.patch"
   "${_patchsource}/v5.14/bbr/0001-bbr2-5.14-introduce-BBRv2.patch"
-  "${_patchsource}/v5.14/bfq-lucjan/5.14-bfq-lucjan-r2K211006v1.patch"
+  "${_patchsource}/v5.14/bfq-lucjan/5.14-bfq-lucjan-r2K211015v1.patch"
+  "${_patchsource}/v5.14/clearlinux-patches/0001-clearlinux-patches.patch"
 )
 validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
@@ -116,7 +117,8 @@ b2sums=('4bb15634eb047d31173be23dac211ce6f4be77f8929cf4f183290e58080aacd70d6512e
         '8f6d6263f0e517b6e7a1809fc57e01cc4b13dd261f778041026ec510f48257d4f525c3cb0b0935e291293960c9191282f5765ca0af3d948838e8f865c7deafcc'
         '21d13b890e7b80c924e18ae11f675d69a80adffbe75e37bebd003024e7299c582346b0df60b67c709eba9678bcf6dda7da852c9cf18d43804ddd8ee9388b9ea5'
         'e263f1cf228d5a2c26340f37fa1b4a6d6c643b1a22378f37c96b68f5ec10372d65e2bf96716aec0722b18d76ca752b9debf82f621896e03917c977d8db2a4b21'
-        'de184a6a500906e86f8b4b8b524ea70b32f9a7ed6522606530caeae17410c6c9a5bbe58914a3c2520cc319d764bd4ff09a291cee986cabfe77a575979ea7a4ff')
+        '3fce113cffb76b40d9661eb5335ed9fa1f2fda8fb50ec9314f6f33e6e8a3a685af1c7c20cdac226d8a3f5866bfba22c7c7bd9cf114fc216c4f0c548dbbaebb06'
+        '76cc1383db1b2bed99341fd4f56831583c827b18fc42e996bff5a2305eaff43eaf951718b3fc288b56e6babc3893c98e6771a4c8f685d652234ff2ac5b05630f')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
