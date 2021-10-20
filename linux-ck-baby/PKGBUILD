@@ -16,6 +16,11 @@ _makenconfig=
 # More at this wiki page ---> https://wiki.archlinux.org/index.php/Modprobed-db
 _localmodcfg=
 
+## Choose between GCC and CLANG config (default is GCC)
+if [ -z ${_compiler+x} ]; then
+  _compiler=gcc
+fi
+
 # Optionally select a sub architecture by number or leave blank which will
 # require user interaction during the build. Note that the generic (default)
 # option is 36.
@@ -73,6 +78,9 @@ license=(GPL2)
 makedepends=(
   bc kmod libelf        cpio perl tar xz
 )
+if [ "${_compiler}" = "clang" ]; then
+  makedepends+=(clang llvm lld python)
+fi
 options=('!strip')
 
 # https://ck-hack.blogspot.com/2021/08/514-and-future-of-muqss-and-ck-once.html
@@ -133,6 +141,15 @@ prepare() {
 
   echo "Setting config..."
   cp ../config .config
+
+    # clang Full LTO
+    if [ "${_compiler}" = "clang" ]; then
+     	echo "Enable FULL LTO"
+    scripts/config --disable CONFIG_LTO_NONE
+    scripts/config --disable CONFIG_LTO_CLANG_THIN
+    scripts/config --enable CONFIG_LTO_CLANG_FULL
+    _LLVM=1
+  fi
 
   # disable CONFIG_DEBUG_INFO=y at build time otherwise memory usage blows up
   # and can easily overwhelm a system with 32 GB of memory using a tmpfs build
@@ -198,7 +215,7 @@ prepare() {
 
   # non-interactively apply ck1 default options
   # this isn't redundant if we want a clean selection of subarch below
-  make olddefconfig
+  make LLVM=$_LLVM LLVM_IAS=$_LLVM olddefconfig
   diff -u ../config .config || :
 
   # https://github.com/graysky2/kernel_gcc_patch
@@ -208,10 +225,10 @@ prepare() {
 
   if [ -n "$_subarch" ]; then
     # user wants a subarch so apply choice defined above interactively via 'yes'
-    yes "$_subarch" | make oldconfig
+    yes "$_subarch" | make LLVM=$_LLVM LLVM_IAS=$_LLVM oldconfig
   else
     # no subarch defined so allow user to pick one
-    make oldconfig
+    make LLVM=$_LLVM LLVM_IAS=$_LLVM oldconfig
   fi
 
   ### Optionally load needed modules for the make localmodconfig
@@ -219,17 +236,17 @@ prepare() {
     if [ -n "$_localmodcfg" ]; then
       if [ -f $HOME/.config/modprobed.db ]; then
         echo "Running Steven Rostedt's make localmodconfig now"
-        make LSMOD=$HOME/.config/modprobed.db localmodconfig
+        make LLVM=$_LLVM LLVM_IAS=$_LLVM LSMOD=$HOME/.config/modprobed.db localmodconfig
       else
         echo "No modprobed.db data found"
         exit
       fi
     fi
 
-  make -s kernelrelease > version
+  make LLVM=$_LLVM LLVM_IAS=$_LLVM -s kernelrelease > version
   echo "Prepared $pkgbase version $(<version)"
 
-  [[ -z "$_makenconfig" ]] || make nconfig
+  [[ -z "$_makenconfig" ]] || make LLVM=$_LLVM LLVM_IAS=$_LLVM nconfig
 
   # save configuration for later reuse
   cat .config > "${startdir}/config.last"
@@ -240,7 +257,7 @@ prepare() {
 
 build() {
   cd linux-${pkgver}
-  make all
+  make LLVM=$_LLVM LLVM_IAS=$_LLVM all
 }
 
 _package() {
@@ -272,7 +289,7 @@ _package() {
   #make INSTALL_MOD_PATH="$pkgdir/usr" INSTALL_MOD_STRIP=1 modules_install
   # not needed since not building with CONFIG_DEBUG_INFO=y
 
-  make INSTALL_MOD_PATH="$pkgdir/usr" modules_install
+  make LLVM=$_LLVM LLVM_IAS=$_LLVM INSTALL_MOD_PATH="$pkgdir/usr" modules_install
 
   # remove build and source links
   rm "$modulesdir"/{source,build}
