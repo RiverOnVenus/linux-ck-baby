@@ -9,6 +9,7 @@ The Linux-ck-baby kernel and modules with [Con Kolivas](https://github.com/ckoli
 - [CJKTTY](https://github.com/zhmars/cjktty-patches) supports displaying CJK Unified Ideographs on Linux tty.
 - [BBR](https://github.com/google/bbr) is a congestion control algorithm proposed by Google.
 - [bfq-lucjan](https://gitlab.com/sirlucjan/kernel-patches/tree/master/5.14/bfq-lucjan) is specific patches authored by Paolo Valente and Piotr Gorski.
+- [clear](https://github.com/clearlinux-pkgs/linux) from Intel's Clear Linux project. Provides performance and security optimizations.
 
 # Build and install
 
