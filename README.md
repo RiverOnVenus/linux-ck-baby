@@ -2,7 +2,7 @@
 
 The Linux-ck-baby kernel and modules with [Con Kolivas](https://github.com/ckolivas)' hrtimer patches and Baby CPU scheduler  by [Hamad Al Marri](https://github.com/hamadmarri) and with some other patches. Built on the [Linux-ck](https://aur.archlinux.org/packages/linux-ck/) maintained by [graysky](https://github.com/graysky2).
 
-- [Con Kolivas' hrtimer patches](https://github.com/xanmod/linux-patches/tree/master/linux-5.14.y-xanmod/ck-hrtimer) and the recommended ~~1000 Hz~~ 803 Hz tick rate. 803 Hz is the default for Baby (dl), it's better.
+- [Con Kolivas' hrtimer patches](https://github.com/xanmod/linux-patches/tree/master/linux-5.14.y-xanmod/ck-hrtimer) and the recommended ~~1000 Hz~~ 803 Hz tick rate. 803 Hz is the default for Baby (dl).
 - [Baby-CPU-Scheduler](https://github.com/hamadmarri/Baby-CPU-Scheduler) is a very basic and lightweight yet very performant CPU scheduler.
 - [kernel_compiler_patch](https://github.com/graysky2/kernel_compiler_patch) enables compiler optimizations for additional CPUs.    
 - [UKSM (sources)](https://github.com/dolohow/uksm) / [UKSM (info)](https://www.usenix.org/sites/default/files/conference/protected-files/fast18_slides_xia.pdf) is an improvement upon KSM. Some basic data structures and routines are borrowed from ksm.c .
